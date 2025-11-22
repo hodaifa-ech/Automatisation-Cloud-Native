@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: firewall-cnf
+  namespace: nfv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: firewall
+  template:
+    metadata:
+      labels:
+        app: firewall
+    spec:
+      containers:
+      - name: fw
+        image: ubuntu
+        securityContext:
+          privileged: true
+        command: ["bash", "-c", "apt update && apt install -y iptables iputils-ping && sleep infinity"]

@@ -1,0 +1,12 @@
+---
+- name: Deploy CNF firewall
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Apply CNF manifest to Kubernetes
+      kubernetes.core.k8s:
+        state: present
+        src: ./firewall-cnf.yaml
+        namespace: nfv
+
+
