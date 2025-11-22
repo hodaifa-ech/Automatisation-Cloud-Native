@@ -1,9 +1,7 @@
 
 # ☁️ Mini-Projet 4 : Automatisation Cloud-Native (K8s + Ansible)
 
-**Module :** Big Data | **Matière :** Virtualisation & Cloud Computing
-**Université :** Université Abdelmalek Essaadi - FST Tanger
-**Filière :** LSI (Logiciels et Systèmes Intelligents)
+
 
 ---
 
@@ -155,5 +153,6 @@ ping -c 3 $POD_IP
 Réalisé par : 
 👨‍💻 **Hodaifa ECHFFANI**
 👨‍💻 **Mohamed Amine BAHASSOU**
+
 
 
