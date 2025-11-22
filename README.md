@@ -1,156 +1,159 @@
-☁️ Mini-Projet 4: Cloud-Native Automation (K8s + Ansible)
 
-Module : Big Data | Matière : Virtualisation & Cloud Computing
+# ☁️ Mini-Projet 4 : Automatisation Cloud-Native (K8s + Ansible)
 
-Université : Université Abdelmalek Essaadi - FST Tanger
+**Module :** Big Data | **Matière :** Virtualisation & Cloud Computing
+**Université :** Université Abdelmalek Essaadi - FST Tanger
+**Filière :** LSI (Logiciels et Systèmes Intelligents)
 
-Filière : LSI (Logiciels et Systèmes Intelligents)
+---
 
-📖 Aperçu du Projet
+## 📖 Présentation du Projet
 
-Ce projet illustre la transition de la virtualisation des fonctions réseau classique (NFV) vers les fonctions réseau Cloud-Native (CNF).
+Ce projet illustre la transition des architectures réseaux classiques vers les **architectures Cloud-Native**.
 
-L'objectif est de déployer un Pare-feu conteneurisé au sein d'un cluster Kubernetes, le tout automatisé via Ansible. Cette architecture simule un environnement moderne de type Edge Computing où les fonctions réseau sont agiles, scalables et gérées par le code (Infrastructure-as-Code).
+L'objectif principal est de déployer une **Fonction Réseau Conteneurisée (CNF)** agissant comme un **Pare-feu (iptables)**, au sein d'un cluster **Kubernetes**. L'ensemble du déploiement est automatisé grâce à **Ansible**, simulant ainsi un environnement de production moderne (**Infrastructure as Code**).
 
-🎯 Objectifs Clés
+---
 
-Déployer un cluster Kubernetes léger (K3s).
+## 🎯 Objectifs
 
-Créer une CNF (Container Network Function) capable de filtrer les paquets.
+* **Infrastructure :** Mise en place d'un cluster Kubernetes léger avec **K3s**.
+* **Réseau :** Déploiement d'une CNF capable de filtrer le trafic (**iptables**).
+* **Automatisation :** Écriture de playbooks **Ansible** pour gérer le cycle de vie de l'application.
+* **Validation :** Test de pénétration et blocage de protocoles (**ICMP/Ping**).
 
-Automatiser le déploiement complet avec Ansible.
+---
 
-Valider le fonctionnement du pare-feu en bloquant le protocole ICMP (Ping).
+## 🏗️ Architecture Technique
 
-🏗️ Architecture
+Le projet repose sur une **Machine Virtuelle Linux (Ubuntu)** qui héberge l'ensemble de la stack :
 
-Le projet s'exécute sur une Machine Virtuelle Linux (Ubuntu) hébergeant la stack suivante :
+| Composant | Technologie | Rôle |
+| :--- | :--- | :--- |
+| **Host** | Ubuntu 22.04 | Système hôte pour la virtualisation. |
+| **Orchestrateur** | K3s | Distribution Kubernetes optimisée pour l'Edge. |
+| **CNF** | Ubuntu Pod | Conteneur privilégié exécutant iptables. |
+| **Automation** | Ansible | Outil d'automatisation sans agent. |
+| **Connectivité** | CNI | Gestion du réseau inter-pods. |
 
-Composant
+---
 
-Technologie
+## 🛠️ Pré-requis
 
-Description
+Avant de démarrer, assurez-vous d'avoir les outils suivants installés sur votre machine (VM Ubuntu) :
 
-Hôte
+### Mise à jour et Outils de base
 
-Ubuntu 22.04
-
-Système d'exploitation de base.
-
-Orchestrateur
-
-K3s
-
-Distribution Kubernetes légère pour l'Edge/IoT.
-
-CNF
-
-Ubuntu Pod + iptables
-
-Le conteneur agissant comme Pare-feu.
-
-Automatisation
-
-Ansible
-
-Gère le cycle de vie via des Playbooks.
-
-Réseau
-
-CNI (Flannel/Calico)
-
-Gère la communication entre les Pods.
-
-🛠️ Pré-requis
-
-Avant de lancer l'automatisation, assurez-vous d'avoir installé les éléments suivants sur votre machine Linux :
-
-Outils Système :
-
+```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl git python3 python3-pip
+````
 
+### Cluster Kubernetes (K3s)
 
-Kubernetes (K3s) :
-
+```bash
 curl -sfL [https://get.k3s.io](https://get.k3s.io) | sh -
+```
 
+### Ansible et dépendances Python
 
-Ansible & Librairies Python :
-
+```bash
 sudo apt install -y ansible
-pip3 install kubernetes  # Requis pour le module K8s d'Ansible
+pip3 install kubernetes  # Indispensable pour le module k8s d'Ansible
+```
 
+-----
 
-🚀 Installation & Utilisation
+## 🚀 Installation et Utilisation
 
-1. Cloner le dépôt
+### 1\. Cloner le projet
 
-git clone [https://github.com/VOTRE_USERNAME/mini-projet-cloud-native.git](https://github.com/VOTRE_USERNAME/mini-projet-cloud-native.git)
-cd mini-projet-cloud-native
+Récupérez le code source depuis GitHub :
 
+```bash
+git clone https://github.com/hodaifa-ech/Automatisation-Cloud-Native.git
+cd Automatisation-Cloud-Native
+```
 
-2. Configurer l'environnement
+### 2\. Configuration de l'accès Kubernetes
 
-Assurez-vous que votre utilisateur standard a accès à la configuration Kubernetes :
+Configurez les droits pour que votre utilisateur puisse interagir avec le cluster sans `sudo` :
 
+```bash
 mkdir -p ~/.kube
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-sudo chown $USER:$USER ~/.kube/config
+sudo chown $(whoami):$(whoami) ~/.kube/config
+```
 
+### 3\. Lancer le déploiement automatisé
 
-3. Lancer l'automatisation
+Exécutez le playbook Ansible. Ce script va créer le namespace `nfv` et déployer le pare-feu conteneurisé.
 
-Exécutez le playbook Ansible pour déployer le namespace et la CNF pare-feu :
-
+```bash
 ansible-playbook deploy.yml
+```
 
+-----
 
-Note : Le playbook utilise une connexion localhost pour communiquer avec le cluster K3s local.
+## 🧪 Tests et Vérification
 
-🧪 Tests & Vérification
+### 1\. Vérifier l'état des Pods
 
-1. Vérifier le déploiement
+Assurez-vous que le pod pare-feu est en statut `Running` :
 
-Vérifiez que le Pod est bien en cours d'exécution dans le namespace nfv :
-
+```bash
 kubectl get pods -n nfv
+```
 
+### 2\. Activer le Pare-feu (Simulation)
 
-2. Simuler une règle Pare-feu (Bloquer le Ping)
+Par défaut, tout le trafic passe. Nous allons injecter une règle pour bloquer le **Ping (ICMP)** au sein du conteneur CNF.
 
-Par défaut, le conteneur laisse passer le trafic. Bloquons le protocole ICMP pour tester la capacité du pare-feu :
+**Récupération automatique du nom du pod**
 
-# Récupérer le nom du Pod
+```bash
 POD_NAME=$(kubectl get pods -n nfv -l app=firewall -o jsonpath="{.items[0].metadata.name}")
+```
 
-# Injecter la règle iptables
+**Injection de la règle iptables dans le conteneur**
+
+```bash
 kubectl exec -it $POD_NAME -n nfv -- iptables -A INPUT -p icmp -j DROP
+```
 
+### 3\. Tester la connectivité
 
-3. Tester la connectivité
+Essayez de pinger le pod. Si le pare-feu fonctionne, vous devriez avoir **100% de perte de paquets**.
 
-Récupérez l'IP du Pod et essayez de le pinger :
+**Récupération de l'IP du pod**
 
+```bash
 POD_IP=$(kubectl get pod $POD_NAME -n nfv --template '{{.status.podIP}}')
+```
+
+**Test de ping**
+
+```bash
 ping -c 3 $POD_IP
+```
 
+-----
 
-Résultat attendu : 100% packet loss (Le pare-feu fonctionne correctement).
+## 📂 Structure des Fichiers
 
-📂 Structure du Projet
-
+```
 .
-├── README.md           # Documentation du projet
-├── deploy.yml          # Playbook Ansible d'automatisation
-└── firewall-cnf.yaml   # Manifeste Kubernetes (Définition du Déploiement)
+├── README.md           # Documentation complète du projet
+├── deploy.yml          # Playbook Ansible pour l'automatisation
+└── firewall-cnf.yaml   # Manifeste Kubernetes (Déploiement du Pod)
+```
 
+-----
 
-👥 Auteurs & Crédits
+## 👥 Auteurs
 
 Réalisé par : 
-👨‍💻 Hodaifa ECHFFANI
-👨‍💻 Mohamed Amine BAHASSOU
+👨‍💻 **Hodaifa ECHFFANI**
+👨‍💻 **Mohamed Amine BAHASSOU**
 
 
